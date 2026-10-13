@@ -1,0 +1,16 @@
+[Unit]
+Description=Codex voice notify (status sounds + text-to-speech web page)
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/codex-voice-notify
+ExecStart=/usr/bin/python3 /opt/codex-voice-notify/server.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

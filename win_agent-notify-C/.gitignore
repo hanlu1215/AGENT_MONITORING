@@ -1,0 +1,7 @@
+build/
+audio_cache/
+.venv/
+*.exe
+*.json
+*.log
+tools\__pycache__

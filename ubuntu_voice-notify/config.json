@@ -1,0 +1,56 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8080,
+    "token": ""
+  },
+  "audio": {
+    "player": "auto",
+    "volume": 0.6,
+    "mute": false,
+    "device": "",
+    "cache_dir": "audio_cache"
+  },
+  "sounds": {
+    "idle": [],
+    "working": [[880, 90], [0, 70]],
+    "waiting_approval": [[2700, 90], [0, 80], [2700, 90], [0, 80], [2700, 120], [0, 100]],
+    "completed": [[1500, 120], [0, 60], [2700, 200], [0, 80]],
+    "interrupted": [[900, 150], [0, 90], [700, 260], [0, 80]],
+    "info": [[2000, 100], [0, 80]]
+  },
+  "remind": {
+    "enabled": true,
+    "statuses": ["waiting_approval"],
+    "interval_sec": 30,
+    "max_times": 5
+  },
+  "tts": {
+    "backend": "auto",
+    "voice": "zh-CN-XiaoxiaoNeural",
+    "rate": "+0%",
+    "volume": "+0%",
+    "pitch": "+0Hz",
+    "piper_model": "",
+    "espeak_voice": "cmn+f3",
+    "espeak_speed": 160,
+    "espeak_pitch": 50,
+    "cache": true,
+    "warmup": [
+      "任务已完成，请检查",
+      "帮我看一下这个报错",
+      "收到，我马上处理"
+    ],
+    "max_chars": 300
+  },
+  "announce": {
+    "enabled": false,
+    "statuses": ["waiting_approval"],
+    "phrases": {
+      "working": "{agent} 开始工作",
+      "waiting_approval": "{agent} 需要审批",
+      "completed": "{agent} 任务已完成",
+      "interrupted": "{agent} 任务中断"
+    }
+  }
+}
