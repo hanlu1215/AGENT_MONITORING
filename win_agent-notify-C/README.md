@@ -191,7 +191,9 @@ Content-Type: application/json; charset=utf-8
 
 - 默认朗读使用 Edge TTS 的晓晓语音。`.venv` 和网络用于生成新语音；命中 `audio_cache/` 时可直接播放已有缓存。系统也可配置为 Windows SAPI。
 - 清空缓存后要手动重新生成晓晓语音：在 `win_agent-notify-C` 目录打开 PowerShell，运行 `.\.venv\Scripts\python.exe -m pip install edge-tts pypinyin`（只需安装一次），然后运行 `.\.venv\Scripts\python.exe tools\generate_voice_cache.py`。脚本读取 `config.json` 里的声音、语速、音量、缓存目录和自定义播报文案，并生成程序可直接识别的缓存文件名；需要访问网络连接 Edge TTS。只生成某些状态可加 `--status waiting_approval` 等参数，单独生成一段文字可用 `--text "Codex 需要审批"`。
-- 如果 Edge TTS 返回 HTTP 403，先确认 Windows 日期和时间已同步，再更新库：`.\.venv\Scripts\python.exe -m pip install --upgrade edge-tts`。仍失败时通常是当前网络到语音服务的连接被拒绝，可切换网络，或通过 `--proxy http://127.0.0.1:7890` 指定可用代理。
+- **Edge TTS 的合成端点已经迁移**：微软把 Edge「大声朗读」的合成服务从旧地址 `speech.platform.bing.com` 搬到了 `api.msedgeservices.com`，并按地区逐步停用旧地址 —— 旧地址的**合成**请求会直接返回 HTTP 403（语音列表查询暂时还能用）。PyPI 上的 edge-tts（截至 7.2.8）仍然在连旧地址，所以本程序用 `tools/edge_tts_endpoint.py` 在运行时把地址换掉；`tools/edge_tts_cli.py` 是给主程序调用的入口（`localsound.cpp` 会优先走它，脚本不在时才退回 `-m edge_tts`）。生成缓存和程序内的现场合成都已经走新地址，**不需要手动改任何东西**。等 edge-tts 自己适配新地址后，这两个文件就可以删掉。
+- 如果**换了新地址仍然 403**，那就不是端点的问题，而是这台机器的网络出口被限流或不在服务区：先确认系统日期时间准确（时区错也会被拒），再用 `--proxy http://127.0.0.1:7890` 换线路（脚本也会自动探测本机常见代理端口）。实在拿不到晓晓时，把 `local_sound.speech_backend` 改成 `"sapi"`，程序会用 Windows 自带的中文女声。
+- 生成脚本的其他开关：只生成部分状态用 `--status waiting_approval`，单独生成一句用 `--text "Codex 需要审批"`；只想看程序该找哪些缓存文件、本地缺哪些，用 `--verify`（不联网）；已有文件想重新生成加 `--force`；迁移还没轮到这台机器时可以 `--legacy` 强制走旧端点。
 - `config.json` 保存本机设置和凭据；迁移时复制后检查飞书密钥和设备 URL。
 - `audio_cache/` 是可再生成的缓存；想在无 Python 的电脑上沿用已有 Edge TTS 音频，可以一起复制缓存目录。
 - `state.json` 保存会话状态与读取位置；不复制时程序会重新建立状态基线。

@@ -273,7 +273,16 @@ bool SynthEdge(const std::string& exe_dir, const std::string& text, const std::s
     std::string part = dest + ".part.mp3";
     RemoveFile(part);
 
-    std::wstring command = L"\"" + Utf8ToWide(python) + L"\" -m edge_tts --voice " +
+    // 微软把合成服务搬到了新地址 api.msedgeservices.com，旧的 speech.platform.bing.com
+    // 对合成请求直接返回 403（按地区逐步停用）。PyPI 上的 edge-tts 还在连旧地址，
+    // 所以优先走 tools/edge_tts_cli.py —— 它先把地址换掉，再转调官方命令行；
+    // 这个脚本不在时（比如只拷了 exe）退回原来的 `-m edge_tts`。
+    const std::string shim = PathJoin(exe_dir, "tools/edge_tts_cli.py");
+    const std::wstring entry = FileExists(shim)
+        ? L"\"" + Utf8ToWide(shim) + L"\""
+        : L"-m edge_tts";
+
+    std::wstring command = L"\"" + Utf8ToWide(python) + L"\" " + entry + L" --voice " +
                            Utf8ToWide(voice) + L" --rate=" + Utf8ToWide(rate) +
                            L" --volume=" + Utf8ToWide(volume) + L" --text " +
                            Utf8ToWide("\"" + text + "\"") + L" --write-media \"" +
